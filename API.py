@@ -132,11 +132,12 @@ def socialGraph(response):
     if followersURL.endswith('{/other_user}'):
         followersURL = followersURL[:-13]
 
-    t = requests.get(followingURL).json()
-    s = requests.get(followersURL).json()
+    t = requests.get(followingURL, auth=auth).json()
+    s = requests.get(followersURL, auth=auth).json()
     y = 0
     followingList = []
     followersList = []
+    color_list =[]
     while y < len(t):
         name = t[y]['login']
         followingList.append(name)
@@ -147,27 +148,26 @@ def socialGraph(response):
         followersList.append(namef)
         y += 1
     y=0
-    print(followersList)
-    print(followingList)
-    G = nx.path_graph(followingList)
-    G.add_node((str(r['login'])))
-    G.add_nodes_from(followingList)
-    G.add_nodes_from(followersList)
+    G = nx.Graph()
     while y<len(followingList):
         G.add_edges_from(
-            [(str(r['login']), followingList[y])])
+           [(str(r['login']), followingList[y])])
         y += 1
-
+        color_list.append('r')
+    y=0
     while y < len(followersList):
           G.add_edges_from(
           [(str(r['login']), followersList[y])])
+          color_list.append('g')
           y += 1
-    nx.draw(G)
+
+
+    nx.draw_networkx(G, with_labels=True, node_color=color_list)
     plt.show()
     return
 auth = ('C-Nev', '555abb9471e86d7488b68576993c79f902ca1855')
-r = requests.get('https://api.github.com/users/'+str(auth[0]), auth=auth).json()     #an account with followers and is following people
-#percentageFollowback(r)
-#followers_pie_chart(r)
-#repos(r)
+r = requests.get('https://api.github.com/users/'+'WhelanB', auth=auth).json()     #an account with followers and is following people
+percentageFollowback(r)
+followers_pie_chart(r)
+repos(r)
 socialGraph(r)
